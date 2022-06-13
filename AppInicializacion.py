@@ -15,7 +15,7 @@ def Iniciar():
 
     time.sleep(10) 
     
-    subprocess.run('scp root@192.168.10.110:/usr/bin/Emociones.txt /Users/ejcs2/Desktop', shell=True)
+    subprocess.run('scp root@192.168.10.110:/usr/bin/Texto.txt /Users/ejcs2/Desktop', shell=True)
 
 def Escuchar():
     s = pyttsx3.init()  
