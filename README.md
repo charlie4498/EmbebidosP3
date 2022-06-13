@@ -1,7 +1,7 @@
 # EmbebidosP3
 App Inicializacion se encarga de la inicializacion de la aplicacion de reconocimiento atravez de una conexion SSH y la copia de los datos resultantes del analisis de letras. La aplicacion se ejecuta en el cmd.
 
-App Rec es un folder con dos scripts;
+Los archivos de jupyter notebook (extension ipynb) fueron codigos de prueba para los modulos de extraccion y prediccion de letras, correspondientes a Edicion_img para la extraccion de imagenes y Letras para la prediccion. 
 
 ConversionTF-Lite: realiza una conversion de una red neuronal ya entrenada con tensorflow para que utilice tensorflow-lite. Para esto se utiliza el model.h5 extraido de la red neuronal de reconocimiento de emociones ya entrenada utilizando la base de datos emnist para letras escritas, se vuelve a armar la red neuronal con los pesos del modelo y se utilizan las funciones de conversion TF-lite para generar el modelo convertido converted_model.tflite.
 
