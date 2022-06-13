@@ -1,9 +1,7 @@
-import os
+import sys
 import numpy as np
 import cv2 as cv
-import tensorflow as tf
-from tensorflow import keras
-import matplotlib.pyplot as plt
+import tflite_runtime.interpreter as tflite
 
 def obtenerLetras(imagen):
     col = 0
@@ -11,8 +9,6 @@ def obtenerLetras(imagen):
     lista = []
     for i in range(11):
         letra = imagen[4:90 , col+3:col+40]
-        plt.imshow(letra)
-        plt.show()
         lista.append(letra)
         col+=42
     return lista
@@ -21,19 +17,16 @@ def preproc(imagen):
     imagegray = cv.cvtColor(  imagen, cv.COLOR_BGR2GRAY)
     (thresh, imagebw) = cv.threshold(imagegray, 127, 255, cv.THRESH_BINARY)
     imageN= cv.resize(cv.subtract(255, imagebw), (28,28), interpolation = cv.INTER_LINEAR)/255
-    #plt.imshow(image)
-    #plt.show()
-
-    #plt.imshow(imageN, cmap='Greys_r')
-    #plt.show()
-
+    imageN= np.array(imageN, dtype= np.float32)
     imageproc=imageN.reshape(1,28,28,1)
     return imageproc
 
 def predictlist (list1, list2, label):
     for i in list1:
         imageproc= preproc(i)
-        predicted1 = model.predict(imageproc)
+        interpreter.set_tensor(input_details[0]['index'], imageproc)
+        interpreter.invoke()
+        predicted1 = interpreter.get_tensor(output_details[0]['index'])
         predicted=np.argmax(predicted1)
         list2.append(label[predicted-1])
     return list2
@@ -45,24 +38,16 @@ return_value, image = camera.read()
 cv.imwrite('opencv.png', image)
 del(camera)
 
-plt.imshow(image)
-plt.show() 
 
 image = image[132:385 , 5:470]
 
 Nombre = image[2:42 , 0:465]
-#plt.imshow(Nombre)
-#plt.show() 
 listaNombre = obtenerLetras(Nombre)
 
 Apellido1 = image[107:145 , 0:465]
-#plt.imshow(Apellido1)
-#plt.show()
 listaApellido1 = obtenerLetras(Apellido1)
 
 Apellido2 = image[212:247 , 2:465]
-#plt.imshow(Apellido2)
-#plt.show()
 listaApellido2 = obtenerLetras(Apellido2)
 
 f= open('Letras.txt', 'r+')
@@ -74,7 +59,12 @@ predictApellido1=[]
 predictApellido2=[]
 
 #Cargar modelo
-model = keras.models.load_model('emnist_v5.h5')
+interpreter=tflite.Interpreter(model_path="/usr/bin/converted_model.tflite")
+interpreter.allocate_tensors()
+
+# Get input and output tensors.
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
 
 #Definir labels
 label=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
